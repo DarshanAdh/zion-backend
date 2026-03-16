@@ -2,6 +2,7 @@ const express = require('express');
 const { param, query } = require('express-validator');
 const Location = require('../models/Location');
 const validate = require('../middleware/validate');
+const seedLocationsIfEmpty = require('../config/seedLocations');
 
 const router = express.Router();
 
@@ -15,6 +16,8 @@ router.get(
   validate,
   async (req, res, next) => {
     try {
+      // Ensure location data exists even if startup seed was skipped.
+      await seedLocationsIfEmpty();
       const filter = {};
       if (req.query.city) filter.city = new RegExp(`^${req.query.city}$`, 'i');
       if (req.query.zip) filter.zip = req.query.zip;
